@@ -1,0 +1,237 @@
+//by Max Johnson
+/*
+m = motor
+            m1   b   m2
+             O———————O
+            /         \ c
+         a /
+          /
+      ___O___ <-m0
+____h{|__O__|____
+         ^mb (motor in base that rotates arm)
+*/
+
+//TODO: make a few points (calibration curve) for converting rad to microseconds
+
+#include <Servo.h> 
+
+const double a = 32; //length in cm
+const double b = 32; //length in cm
+const double c = 8;  //length in cm
+const double h = 6;  //length in cm
+const double pi=3.1416;
+
+double m0 = 0; //angle (rad) above horizontal (shoulder)
+double m1 = pi; //angle (rad) between a and b (elbow)
+double m2 = pi; //angle (rad) between b and c (wrist)
+double m2abs=pi;//angle (rad) between c and horizontal
+double mb = 1500; //microseconds (base)
+
+
+const double fastmbStep = 10; //µs
+const double fastm2Step = 0.035;
+const double fastdStep = 0.2;
+const double fastzStep = 0.2;
+const double slowmbStep = 1; //µs
+const double slowm2Step = 0.0035;
+const double slowdStep = 0.015;
+const double slowzStep = 0.02;
+double mbStep = fastmbStep; //step distance (rad) for mb angle
+double m2Step = fastm2Step; //step distance (rad) for m2 angle
+double dStep = fastdStep; //step distance (cm) for d
+double zStep = fastzStep; //step distance (cm) for z
+
+const double m0max=1.85; //about 105 deg
+const double m0min=0;
+const double m1max=2.778; //calculated to be 2249µs
+const double m1min=0.134; //calculated to be 751µs
+const double m2max=4.335; //calculated to be 751µs
+const double m2min=1.777; //calculated to be 2249µs
+const double mbmax=2040; //µs
+const double mbmin=900; //µs
+const double dMax=a+b;
+const double dMin=5; //TODO: play with this
+const double zMax=a+b; //note: d*d+z*z <= (a+b)(a+b) regardless of dMax and zMax. There's no real reason to make either lower
+const double zMin=-10; //TODO: play with this
+double d=a+b; //distance (cm) to reach (r in polar)
+double z=0; //distance (cm) from base (h above ground) to m2
+double x=sqrt(d*d+z*z); //x is distance from m0 to m2 (calculated)
+
+Servo servoM0;
+Servo servoM1;
+Servo servoM2;
+Servo servoMb;
+
+//Pins
+const int pinForward=4; //change d, 
+const int pinBackward=5;//which will move m0 and m1
+const int pinUpward=12; //change z, 
+const int pinDownward=13;//which will move m0 and m1
+const int pinRotateLeft=8; //rotate base motor (mb)
+const int pinRotateRight=7;
+const int pinHandOut=2; //rotate wrist (m2)
+const int pinHandIn=3;
+const int toggleSpeed=A0;
+int i=0;
+void setup()
+{
+  Serial.begin(9600);
+  servoM0.attach(9);
+  servoM1.attach(10);
+  servoM2.attach(11);
+  servoMb.attach(6);
+  
+  servoM0.writeMicroseconds(getM0pos());
+  servoM1.writeMicroseconds(getM1pos());
+  servoM2.writeMicroseconds(getM2pos());
+  
+}
+ 
+void loop()
+{
+  delay(5);
+  i++;
+  if(i%100==-1){
+    Serial.print("m0: ");
+    Serial.println(servoM0.read());
+    Serial.print("m1: ");
+    Serial.println(servoM1.read());
+    Serial.print("m2: ");
+    Serial.println(servoM2.read());
+    Serial.print("mB: ");
+    Serial.println(servoMb.read());
+    i=0;
+  }
+  if(digitalRead(pinForward)==1){
+    Serial.println("forward");
+    if(d+dStep<dMax)
+      d+=dStep;
+    if(d*d+z*z>(a+b)*(a+b)){ //basically just make the arm not try to stretch more than a+b
+      double dT = sqrt(dStep*dStep+zStep*zStep)/(a+b); //change in angle
+      d=(a+b)*cos(m0-dT);
+      z=sqrt((a+b)*(a+b)-d*d)-0.000001;
+    }
+    x=sqrt(sq(d)+sq(z));
+    servoM0.writeMicroseconds(getM0pos());
+    servoM1.writeMicroseconds(getM1pos());
+    servoM2.writeMicroseconds(getM2pos());
+  }
+  if(digitalRead(pinBackward)==1){
+    Serial.println("backward");
+    if(d-dStep>dMin /*&& m1>0*/)
+      d-=dStep;
+    x=sqrt(sq(d)+sq(z));
+    servoM0.writeMicroseconds(getM0pos());
+    servoM1.writeMicroseconds(getM1pos());
+    servoM2.writeMicroseconds(getM2pos());
+  }
+  if(digitalRead(pinUpward)==1){
+    Serial.println("upward");
+    if(z+zStep<zMax)
+      z+=zStep;
+    if(d*d+z*z>(a+b)*(a+b)){
+      double dT = sqrt(dStep*dStep+zStep*zStep)/(a+b);
+      z=(a+b)*sin(m0+dT);
+      d=sqrt((a+b)*(a+b)-z*z)-0.000001;
+    }
+    x=sqrt(sq(d)+sq(z));
+    servoM0.writeMicroseconds(getM0pos());
+    servoM1.writeMicroseconds(getM1pos());
+    servoM2.writeMicroseconds(getM2pos());
+  }
+  if(digitalRead(pinDownward)==1){
+    Serial.println("downward");
+    if(z>zMin)
+      z-=zStep;
+    x=sqrt(sq(d)+sq(z));
+    servoM0.writeMicroseconds(getM0pos());
+    servoM1.writeMicroseconds(getM1pos());
+    servoM2.writeMicroseconds(getM2pos());
+  }
+  if(digitalRead(pinRotateLeft)==1){
+    Serial.println("leftward");
+    if(mb>mbmin){
+      Serial.println(mb);
+      mb-=mbStep;
+    }
+    servoMb.writeMicroseconds(getMBpos());
+  }
+  if(digitalRead(pinRotateRight)==1){
+    Serial.println("rightward");
+    if(mb<mbmax){
+      Serial.println(mb);
+      mb+=mbStep;
+    }
+    servoMb.writeMicroseconds(getMBpos());
+  }
+  if(digitalRead(pinHandOut)==1){
+    Serial.println("hand out");
+    if(m2<m2max)
+      m2abs+=m2Step;
+    servoM2.writeMicroseconds(getM2pos());
+  }
+  if(digitalRead(pinHandIn)==1){
+    Serial.println("hand in");
+    if(m2>m2min)
+      m2abs-=m2Step;
+    servoM2.writeMicroseconds(getM2pos());
+  }
+  if(analogRead(toggleSpeed)<512){
+    //Serial.println("toggle speed");
+    mbStep = fastmbStep;
+    m2Step = fastm2Step;
+    dStep = fastdStep;
+    zStep = fastzStep;
+  } else {
+    mbStep = slowmbStep;
+    m2Step = slowm2Step;
+    dStep = slowdStep;
+    zStep = slowzStep;
+  }
+}
+
+double getM0pos(){
+  m0=acos((sq(a)+sq(x)-sq(b))/(2*a*x))+atan(z/d);
+  if(m0>m0max){
+    m0=m0max;
+  }
+  if(m0<m0min){
+    m0=m0min;
+  }
+//(m0-reference angle in rad)*(µs/rad equivalence) + reference in µs
+  return constrain((m0-0)*((1715-900)/(pi/2-0)) + 900, 751, 2249); //900µs=0 rad, 1715µs=pi/2 rad
+}
+double getM1pos(){
+  m1=acos((sq(a)+sq(b)-sq(x))/(2*a*b));
+  if(m1>m1max){
+    m1=m1max;
+  }
+  if(m1<m1min){
+    m1=m1min;
+  }
+  //(m0-center pos angle)*(µs/rad equivalence) + center pos for µs (1500)
+  return constrain((m1-pi/2)*((1565-1120)/(pi/2-pi/4)) + 1565, 751, 2249); //1565µs=pi/2 rad, 1120µs=pi/4 rad
+}
+double getM2pos(){
+  m2=m2abs+pi-m0-m1; 
+  if(m2<m2min){
+    m2=m2min;
+    m2abs=m0+m1+m2-pi;
+  }
+  if(m2>m2max){
+    m2=m2max;
+    m2abs=m0+m1+m2-pi;
+  }
+  //(m2-center pos angle)*(µs/rad equivalence) + center pos for µs (1500)
+  return constrain((m2-3.0*pi/4.0)*((1910-1450)/(3.0*pi/4.0 - pi)) + 1910, 751, 2249); //1910µs=3pi/4, 1450µs=pi
+}
+double getMBpos(){
+  if(mb>mbmax){
+    mb=mbmax;
+  }
+  if(mb<mbmin){
+    mb=mbmin;
+  }
+  //(mb-center pos angle)*(µs/rad equivalence) + center pos for µs (1500)
+  return constrain(mb, 900, 2050);
+}

@@ -1,4 +1,7 @@
 //by Max Johnson
+//Written for Arduino (Uno if it matters)
+//Using a separate control board (no computer) with lotsa buttons
+//Moves forward with constant height, up with constant horizontal position, rotates arm left/right, and hand in/out
 /*
 m = motor
             m1   b   m2

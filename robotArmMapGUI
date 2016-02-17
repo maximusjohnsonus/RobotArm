@@ -4,14 +4,14 @@ import vsync.*;
 //by Max Johnson
 /*
 m = motor
- m1   b   m2
- O———————O
- /         \ c
- a /
- /
- ___O___ <-m0
+              m1   b   m2
+              O———————O
+             /         \ c
+          a /
+           /
+       ___O___ <-m0
  ____h{|__O__|____
- ^mb (motor in base that rotates arm)
+          ^mb (motor in base that rotates arm)
  
  COMPETITION AREA
  75x75 cm (marked by inside edge of tape (~2.5 cm wide (electrical tape is 1.9 cm))
@@ -28,10 +28,10 @@ m = motor
 //run sketch robotArmProcessingReceiver on arduino
 
 //Arm Sizes
-final float a = 32; //length in cm
-final float b = 32; //length in cm
-final float c = 8;  //length in cm
-final float h = 6;  //length in cm //this one doesn't actually matter much?
+final float a = 31.1; //length in cm
+final float b = 31.3; //length in cm
+final float c = 8;  //length in cm //this one really doesn't matter??
+final float h = 11;  //length in cm //this one doesn't actually matter much?
 
 //Constant
 final float pi=3.1416;
@@ -51,7 +51,7 @@ final float pencilWidth=0.5;
 final float pencilDiameter = 7; //for drawing
 final float slotDiameter = 5; //for positioning
 final float slotDrawDiameter = 5; //for drawing
-float[] armPos={75.0/2, 75-15};
+float[] armPos={75.0/2, 75-17};
 //first index is item, second index is x/y coord (origin is NW corner)
 //all objects are drawn as circles for ease of clicking
 float[][] pingpongPos = {{(75-30)/2.0-tapeWidth-pingpongDiameter/2, 75-30-tapeWidth+pingpongDiameter/2}, 
@@ -95,13 +95,13 @@ float[][] slotPos = {{slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}
   {75/2.0+slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}};
 
 //Heights to be at when hotkeying to various areas
-final float pingpongZ=10;
-final float legoZ=10;
-final float diceZ=10;
-final float pencilZ=10;
-final float cartonZ=10;
-final float generalZ=10;
-
+final float pingpongZ=15;
+final float legoZ=12;
+final float diceZ=12;
+final float pencilZ=12;
+final float cartonZ=17;
+final float generalZ=15;
+final float maneuveringZ=25;
 //Other good positions
 final float[] preStartPos = {1,0,a+b-2}; //(r, theta in µs, z)
 final float[] startPos = {legoPos[2][0],legoPos[2][1],legoZ}; //cartesian coords
@@ -141,9 +141,9 @@ final float m2max=4.335; //calculated to be 751µs
 final float m2min=1.777; //calculated to be 2249µs
 final float mbmax=2040; //µs
 final float mbmin=900; //µs
-final float dMax=a+b;
+final float dMax=a+b-0.5;
 final float dMin=1; //TODO: play with this
-final float zMax=a+b; //note: d*d+z*z <= (a+b)(a+b) regardless of dMax and zMax. There's no real reason to make either lower
+final float zMax=a+b-0.5; //note: d*d+z*z <= (a+b)(a+b) regardless of dMax and zMax. There's no real reason to make either lower
 final float zMin=-10; //TODO: play with this
 
 //Keys
@@ -160,6 +160,7 @@ final char grip='e';
 final char unGrip='d';
 final char startRun='p';
 final char gotoPreStart='o';
+final char pointHandDown='f';
 
 //Variables (angles for motors, d, z)
 float m0 = pi/2; //angle (rad) above horizontal (shoulder)
@@ -186,7 +187,7 @@ boolean gottaGoFast=false; //set to true to get to a target d, z, mB
 float targetD;
 float targetZ;
 float targetMB;
-final float jumpSpeed = 0.5; //_ times faster than normal
+final float jumpSpeed = 5; //_ times faster than normal
 long time;
 boolean runTime=false;
 
@@ -222,7 +223,8 @@ void setup()
     keyHandOut+"/"+keyHandIn+" - Hand Out/In \n"+
     startRun+" - Start run \n"+
     gotoPreStart+" - Go to starting position \n"+
-    grip+"/"+unGrip+" - Grip/ungrip"
+    grip+"/"+unGrip+" - Grip/ungrip \n"+
+    pointHandDown+" - Point hand down"
     ,80*scale,250,1300,700);
 }
 void draw() {
@@ -247,7 +249,8 @@ void draw() {
    i=0;
    }*/
   stroke(color(random(255), random(255), random(255)));
-  line(scale*armPos[0], scale*armPos[1], scale*(armPos[0]+d*sin((mb-1500)*2.0*pi/3.0/(-600))), scale*(armPos[1]-d*cos((mb-1500)*2.0*pi/3.0/(-600))));
+  line(scale*armPos[0], scale*armPos[1], scale*(armPos[0]+d*sin((mb-1065)*pi/(-775)+pi/2)), scale*(armPos[1]-d*cos((mb-1065)*pi/(-775)+pi/2)));
+
   stroke(0);
   for (int obj=0; obj<pingpongPos.length; obj++) {
     if (mouseOverCircle(scale*pingpongPos[obj][0], scale*pingpongPos[obj][1], scale*pingpongDrawDiameter)) {
@@ -291,41 +294,46 @@ void draw() {
   }
   
   if(gottaGoFast){
-    if(z<targetZ){
+    if(z<maneuveringZ && !(d==targetD && mb==targetMB)){ //go up a safe distance
       z+=jumpSpeed*fastzStep;
-      if(z>targetZ){
-        z=targetZ;
-      }
-    } else if(z>targetZ){
-      z-=jumpSpeed*fastzStep;
-      if(z<targetZ){
-        z=targetZ;
-      }
-    }
-    if(d<targetD){
-      d+=jumpSpeed*fastdStep;
-      if(d>targetD){
-        d=targetD;
-      }
-    } else if(d>targetD){
-      d-=jumpSpeed*fastdStep;
+    } else { //then maneuver
       if(d<targetD){
-        d=targetD;
+        d+=jumpSpeed*fastdStep;
+        if(d>targetD){
+          d=targetD;
+        }
+      } else if(d>targetD){
+        d-=jumpSpeed*fastdStep;
+        if(d<targetD){
+          d=targetD;
+        }
       }
-    }
-    if(mb<targetMB){
-      mb+=jumpSpeed*fastmbStep;
-      if(mb>targetMB){
-        mb=targetMB;
-      }
-    } else if(mb>targetMB){
-      mb-=jumpSpeed*fastmbStep;
       if(mb<targetMB){
-        mb=targetMB;
+        mb+=jumpSpeed*fastmbStep;
+        if(mb>targetMB){
+          mb=targetMB;
+        }
+      } else if(mb>targetMB){
+        mb-=jumpSpeed*fastmbStep;
+        if(mb<targetMB){
+          mb=targetMB;
+        }
       }
     }
-    if(z==targetZ && d==targetD && mb==targetMB){
-      gottaGoFast=false;
+    if(d==targetD && mb==targetMB){
+      if(z<targetZ){
+        z+=jumpSpeed*fastzStep;
+        if(z>targetZ){
+          z=targetZ;
+        }
+      } else if(z>targetZ){
+        z-=jumpSpeed*fastzStep;
+        if(z<targetZ){
+          z=targetZ;
+        }
+      } else {
+        gottaGoFast=false;
+      }
     }
     servoM0=getM0pos();
     servoM1=getM1pos();
@@ -394,13 +402,13 @@ void draw() {
       println("hand out");
       if (m2<m2max)
         m2abs+=m2Step;
-      servoM2=getM2pos();
+      //servoM2=getM2pos();
     }
     if (keys[keyHandIn]) {
       println("hand in");
       if (m2>m2min)
         m2abs-=m2Step;
-      servoM2=getM2pos();
+      //servoM2=getM2pos();
     }
     if (keys[toggleSpeed]) {
       mbStep = slowmbStep;
@@ -430,6 +438,11 @@ void draw() {
       targetD = preStartPos[0];
       targetMB = preStartPos[1];
       targetZ = preStartPos[2];
+      gottaGoFast=true;
+    }
+    if(keys[pointHandDown]){
+      println("point hand down");
+      m2abs=pi/2;
     }
   }
   if(runTime){
@@ -455,7 +468,7 @@ int getM0pos() {
   if (m0>m0max) {
     m0=m0max;
   }
-  if (m0<m0min) {
+  if (m0<m0min || Float.isNaN(m0)) {
     m0=m0min;
   }
   //(m0-reference angle in rad)*(µs/rad equivalence) + reference in µs
@@ -464,18 +477,19 @@ int getM0pos() {
 int getM1pos() {
   x=sqrt(sq(d)+sq(z));
   m1=acos((sq(a)+sq(b)-sq(x))/(2*a*b));
-  if (m1>m1max) {
+  if (m1>m1max || Float.isNaN(m1)) {
     m1=m1max;
   }
   if (m1<m1min) {
     m1=m1min;
   }
+  
   //(m0-center pos angle)*(µs/rad equivalence) + center pos for µs (1500)
   return constrain((int)((m1-pi/2)*((1565-1120)/(pi/2-pi/4)) + 1565), 751, 2249); //1565µs=pi/2 rad, 1120µs=pi/4 rad
 }
 int getM2pos() {
   m2=m2abs+pi-m0-m1; 
-  if (m2<m2min) {
+  if (m2<m2min || Float.isNaN(m2)) {
     m2=m2min;
     m2abs=m0+m1+m2-pi;
   }
@@ -549,22 +563,34 @@ void mouseClicked() {
     }
     for (int obj=0; obj<legoPos.length; obj++) {
       if (mouseOverCircle(scale*legoPos[obj][0], scale*legoPos[obj][1], scale*legoDiameter)) {
-
+        targetD=sqrt(sq(legoPos[obj][0]-armPos[0])+sq(legoPos[obj][1]-armPos[1]));
+        targetZ=legoZ;
+        targetMB=getMBfromRad(getTheta(legoPos[obj][0]-armPos[0],legoPos[obj][1]-armPos[1]));
+        return;
       }
     }
     for (int obj=0; obj<dicePos.length; obj++) {
       if (mouseOverCircle(scale*dicePos[obj][0], scale*dicePos[obj][1], scale*diceDiameter)) {
-        
+        targetD=sqrt(sq(dicePos[obj][0]-armPos[0])+sq(dicePos[obj][1]-armPos[1]));
+        targetZ=diceZ;
+        targetMB=getMBfromRad(getTheta(dicePos[obj][0]-armPos[0],dicePos[obj][1]-armPos[1]));
+        return;
       }
     }
     for (int obj=0; obj<pencilPos.length; obj++) {
       if (mouseOverCircle(scale*pencilPos[obj][0], scale*pencilPos[obj][1], scale*pencilDiameter)) {
-
+        targetD=sqrt(sq(pencilPos[obj][0]-armPos[0])+sq(pencilPos[obj][1]-armPos[1]));
+        targetZ=pencilZ;
+        targetMB=getMBfromRad(getTheta(pencilPos[obj][0]-armPos[0],pencilPos[obj][1]-armPos[1]));
+        return;
       }
     }
     for (int obj=0; obj<slotPos.length; obj++) {
       if (mouseOverCircle(scale*slotPos[obj][0], scale*slotPos[obj][1], scale*slotDrawDiameter)) {
-
+        targetD=sqrt(sq(slotPos[obj][0]-armPos[0])+sq(slotPos[obj][1]-armPos[1]));
+        targetZ=cartonZ;
+        targetMB=getMBfromRad(getTheta(slotPos[obj][0]-armPos[0],slotPos[obj][1]-armPos[1]));
+        return;
       }
     }
     //if not over any object, go to where click was
@@ -575,19 +601,19 @@ void mouseClicked() {
 }
 
 float getTheta(float dx, float dy){
-  float theta=atan(dx/dy);
+  float theta=atan(-dx/dy);
   
-  if (dx<0 && dy>0) {
+  if (dx>0 && dy>0) {
     theta=theta+pi;
   }
-  if (dx>0 && dy>0) {
+  if (dx<0 && dy>0) {
     theta=theta-pi;
   }
   return theta;
 }
 float getMBfromRad(float theta) {
   //(theta-reference angle in rad)*(µs/rad equivalence) + reference in µs
-  return (int)((theta-0)*((1500-900)/(0 + 2.0*pi/3.0)) + 1500); //1500µs=0, 900µs=-2pi/3 //TODO: calibrate
+  return (int)((theta-pi/2.0)*((1065-1840)/(pi/2 - (-pi/2.0))) + 1065); //1065µs=pi/2, 1840µs= -pi/2 //TODO: calibrate
 }
 boolean mouseOverCircle(float centerX, float centerY, float diameter) {
   return sq(centerX-mouseX)+sq(centerY-mouseY)<=sq(diameter/2);

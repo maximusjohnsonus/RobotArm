@@ -1,0 +1,46 @@
+#include <VSync.h>
+#include <Servo.h>
+
+ValueReceiver<5> receiver;
+int M0=1500;
+int M1=1500;
+int M2=1500;
+int Mb=1500;
+int Pump=1500;
+
+Servo servoM0;
+Servo servoM1;
+Servo servoM2;
+Servo servoMb;
+Servo servoPump;
+
+void setup()
+{
+  Serial.begin(9600);
+
+  servoM0.attach(9);
+  servoM1.attach(10);
+  servoM2.attach(11);
+  servoMb.attach(6);
+  servoPump.attach(5);
+
+  receiver.observe(M0);
+  receiver.observe(M1);
+  receiver.observe(M2);
+  receiver.observe(Mb);
+  receiver.observe(Pump);
+}
+
+void loop()
+{
+  receiver.sync();
+  servoM0.writeMicroseconds(M0);
+  servoM1.writeMicroseconds(M1);
+  servoM2.writeMicroseconds(M2);
+  servoMb.writeMicroseconds(Mb);
+  servoPump.writeMicroseconds(Pump);
+  delay(10);
+    
+}
+
+

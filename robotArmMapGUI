@@ -50,7 +50,7 @@ final float pencilLength=15;
 final float pencilWidth=0.5;
 final float pencilDiameter = 7; //for drawing
 final float slotDiameter = 5; //for positioning
-final float slotDrawDiameter = 5; //for drawing
+final float slotDrawDiameter = 10; //for drawing
 float[] armPos={75.0/2, 75-17};
 //first index is item, second index is x/y coord (origin is NW corner)
 //all objects are drawn as circles for ease of clicking
@@ -73,37 +73,37 @@ float[][] pencilPos = {{(75+30)/2.0+tapeWidth+pencilLength/2, 75-30-tapeWidth+pe
   {(75+30)/2.0+tapeWidth+pencilLength/2, 75-30-tapeWidth+pencilWidth/2+(30+tapeWidth-pencilWidth)*2.0/4.0}, 
   {(75+30)/2.0+tapeWidth+pencilLength/2, 75-30-tapeWidth+pencilWidth/2+(30+tapeWidth-pencilWidth)*3.0/4.0}, 
   {(75+30)/2.0+tapeWidth+pencilLength/2, 75-30-tapeWidth+pencilWidth/2+(30+tapeWidth-pencilWidth)*4.0/4.0}};
-float[][] slotPos = {{slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, 
-  {slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0}, 
+float[][] slotPos = {/*{slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0},
+  {slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0},*/ /*{slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0}, 
   {slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*1.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*1.0/2.0}, 
-  {slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, 
-  {slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, 
-  {slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, 
+  {slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, */{slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, 
+  /*{slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, 
+  {slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, */
 
-  {75-slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, 
-  {75-slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0}, 
+  /*{75-slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, 
+  {75-slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0},*/ /*{75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0}, 
   {75-slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*1.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*1.0/2.0}, 
-  {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, 
+  {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0},*/ {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, /*
   {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, 
-  {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, 
+  {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, */
 
-  {75/2.0-slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0-slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}, 
+  /*{75/2.0-slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0-slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}, 
   {75/2.0-slotDiameter*3.0/2.0, slotDiameter/2.0}, {75/2.0-slotDiameter*3.0/2.0, slotDiameter*3.0/2.0}, 
   {75/2.0-slotDiameter*1.0/2.0, slotDiameter/2.0}, {75/2.0-slotDiameter*1.0/2.0, slotDiameter*3.0/2.0}, 
-  {75/2.0+slotDiameter*1.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*1.0/2.0, slotDiameter*3.0/2.0}, 
+  {75/2.0+slotDiameter*1.0/2.0, slotDiameter/2.0},*/ {75/2.0+slotDiameter*1.0/2.0, slotDiameter*3.0/2.0}/*, 
   {75/2.0+slotDiameter*3.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*3.0/2.0, slotDiameter*3.0/2.0}, 
-  {75/2.0+slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}};
+  {75/2.0+slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}*/};
 
 //Heights to be at when hotkeying to various areas
-final float pingpongZ=15;
-final float legoZ=12;
-final float diceZ=12;
-final float pencilZ=12;
-final float cartonZ=17;
+final float pingpongZ=11;
+final float legoZ=8;
+final float diceZ=8;
+final float pencilZ=5;
+final float cartonZ=15;
 final float generalZ=15;
-final float maneuveringZ=25;
+final float maneuveringZ=20;
 //Other good positions
-final float[] preStartPos = {1,0,a+b-2}; //(r, theta in µs, z)
+final float[] preStartPos = {1,1500,a+b-2}; //(r, theta in µs, z)
 final float[] startPos = {legoPos[2][0],legoPos[2][1],legoZ}; //cartesian coords
 
 //Colors
@@ -196,7 +196,7 @@ void setup()
   fullScreen();
   //size(500,500);
   
-  Serial serial = new Serial(this, Serial.list()[0], 9600);
+  /*Serial serial = new Serial(this, Serial.list()[0], 9600);
   sender = new ValueSender(this, serial);
   
   sender.observe("servoM0");
@@ -205,52 +205,62 @@ void setup()
   sender.observe("servoMb"); 
   sender.observe("servoPump");  
   delay(1710); 
-  servoPump=1700;
+  servoPump=1700;*/
   
-  background(255);
-  fill(0);
-  rect(scale*((75-30)/2.0-tapeWidth), scale*(75-30-tapeWidth), scale*(30+2*tapeWidth), scale*(30+tapeWidth));
-  rect(0, scale*(75-tapeWidth)/2.0, scale*75, scale*tapeWidth);
-  line(0, scale*75, scale*75, scale*75);
-  line(scale*75, 0, scale*75, scale*75);
-  fill(255);
-  rect(scale*((75-30)/2.0), scale*(75-30), scale*30, scale*30);
-  fill(0);
-  textSize(16);
-  text(keyForward+"/"+keyBackward+" or ↑/↓ - Forward/backward \n"+
-    keyRotateLeft+"/"+keyRotateRight+" or ←/→ - Rotate left/right \n"+
-    keyUpward+"/"+keyDownward+" - Up/down \n"+
-    keyHandOut+"/"+keyHandIn+" - Hand Out/In \n"+
-    startRun+" - Start run \n"+
-    gotoPreStart+" - Go to starting position \n"+
-    grip+"/"+unGrip+" - Grip/ungrip \n"+
-    pointHandDown+" - Point hand down"
-    ,80*scale,250,1300,700);
 }
 void draw() {
   servoM0=getM0pos();
   servoM1=getM1pos();
   servoM2=getM2pos();
   servoMb=getMBpos();
+  
+  if(keys['l']){ //log positions
+    print("//pingpong pos \n{");
+    for (int obj=0; obj<pingpongPos.length; obj++) {
+      println("{"+pingpongPos[obj][0]+","+pingpongPos[obj][1]+"},");
+    }
+    print("//lego pos \n{");
+    for (int obj=0; obj<legoPos.length; obj++) {
+      println("{"+legoPos[obj][0]+","+legoPos[obj][1]+"},");
+    }
+    print("//dice pos \n{");
+    for (int obj=0; obj<dicePos.length; obj++) {
+      println("{"+dicePos[obj][0]+","+dicePos[obj][1]+"},");
+    }
+    print("//pencil pos \n{");
+    for (int obj=0; obj<pencilPos.length; obj++) {
+      println("{"+pencilPos[obj][0]+","+pencilPos[obj][1]+"},");
+    }
+    print("//slot pos \n{");
+    for (int obj=0; obj<slotPos.length; obj++) {
+      println("{"+slotPos[obj][0]+","+slotPos[obj][1]+"},");
+    }
+  }
 
   delay(5);
+
+  background(255);
+  fill(0);
+  stroke(0);
+  textSize(16);
+  text(keyForward+"/"+keyBackward+" or ↑/↓ - Forward/backward \n"+
+    keyRotateLeft+"/"+keyRotateRight+" or ←/→ - Rotate left/right \n"+
+    keyUpward+"/"+keyDownward+" - Up/down \n"+
+    keyHandOut+"/"+keyHandIn+" - Hand Out/In \n"+
+    "Space - Hold to go slow \n"+
+    startRun+" - Start run \n"+
+    gotoPreStart+" - Go to starting position \n"+
+    grip+"/"+unGrip+" - Grip/ungrip \n"+
+    pointHandDown+" - Point hand down \n"+
+    "Click to go, Right click to calibrate"
+    ,80*scale,250,1300,700);
+  rect(scale*((75-30)/2.0-tapeWidth), scale*(75-30-tapeWidth), scale*(30+2*tapeWidth), scale*(30+tapeWidth));
+  rect(0, scale*(75-tapeWidth)/2.0, scale*75, scale*tapeWidth);
+  line(0, scale*75, scale*75, scale*75);
+  line(scale*75, 0, scale*75, scale*75);
+  fill(255);
+  rect(scale*((75-30)/2.0), scale*(75-30), scale*30, scale*30);
   
-  //background(color(255));
-
-  /*if(i%100==-1){
-   print("m0: ");
-   println(servoM0.read());
-   print("m1: ");
-   println(servoM1.read());
-   print("m2: ");
-   println(servoM2.read());
-   print("mB: ");
-   println(servoMb.read());
-   i=0;
-   }*/
-  stroke(color(random(255), random(255), random(255)));
-  line(scale*armPos[0], scale*armPos[1], scale*(armPos[0]+d*sin((mb-1065)*pi/(-775)+pi/2)), scale*(armPos[1]-d*cos((mb-1065)*pi/(-775)+pi/2)));
-
   stroke(0);
   for (int obj=0; obj<pingpongPos.length; obj++) {
     if (mouseOverCircle(scale*pingpongPos[obj][0], scale*pingpongPos[obj][1], scale*pingpongDrawDiameter)) {
@@ -267,6 +277,9 @@ void draw() {
       fill(legoColor);
     }
     ellipse(scale*legoPos[obj][0], scale*legoPos[obj][1], scale*legoDiameter, scale*legoDiameter);
+    fill(0);
+    textSize(12);
+    text("LEGO",scale*legoPos[obj][0]-16, scale*legoPos[obj][1]+4);
   }
   for (int obj=0; obj<dicePos.length; obj++) {
     if (mouseOverCircle(scale*dicePos[obj][0], scale*dicePos[obj][1], scale*diceDiameter)) {
@@ -275,6 +288,9 @@ void draw() {
       fill(diceColor);
     }
     ellipse(scale*dicePos[obj][0], scale*dicePos[obj][1], scale*diceDiameter, scale*diceDiameter);
+    fill(0);
+    textSize(16);
+    text("DIE!",scale*dicePos[obj][0]-14, scale*dicePos[obj][1]+6);
   }
   for (int obj=0; obj<pencilPos.length; obj++) {
     if (mouseOverCircle(scale*pencilPos[obj][0], scale*pencilPos[obj][1], scale*pencilDiameter)) {
@@ -290,13 +306,17 @@ void draw() {
     } else {
       fill(slotColor);
     }
-    ellipse(scale*slotPos[obj][0], scale*slotPos[obj][1], scale*slotDiameter, scale*slotDiameter);
+    ellipse(scale*slotPos[obj][0], scale*slotPos[obj][1], scale*slotDrawDiameter, scale*slotDrawDiameter);
   }
+  
+  stroke(color(random(255), random(255), random(255)));
+  line(scale*armPos[0], scale*armPos[1], scale*(armPos[0]+d*sin((mb-1065)*pi/(-775)+pi/2)), scale*(armPos[1]-d*cos((mb-1065)*pi/(-775)+pi/2)));
   
   if(gottaGoFast){
     if(z<maneuveringZ && !(d==targetD && mb==targetMB)){ //go up a safe distance
       z+=jumpSpeed*fastzStep;
     } else { //then maneuver
+      m2abs=pi/2; //point hand down
       if(d<targetD){
         d+=jumpSpeed*fastdStep;
         if(d>targetD){
@@ -321,7 +341,7 @@ void draw() {
       }
     }
     if(d==targetD && mb==targetMB){
-      if(z<targetZ){
+      if(z<targetZ){ //then go (down) to the proper Z
         z+=jumpSpeed*fastzStep;
         if(z>targetZ){
           z=targetZ;
@@ -432,6 +452,10 @@ void draw() {
       println("start run");
       time=millis();
       runTime=true;
+      targetD = sqrt(sq(startPos[0]-armPos[0])+sq(startPos[1]-armPos[1]));
+      targetMB = getMBfromRad(getTheta(startPos[0]-armPos[0],startPos[1]-armPos[1]));
+      targetZ = startPos[2];
+      gottaGoFast=true;
     }
     if(keys[gotoPreStart] && !runTime){
       println("goto pre-Start");
@@ -447,9 +471,6 @@ void draw() {
   }
   if(runTime){
     long timerTime = 180-(millis()-time)/1000;
-    fill(255);
-    stroke(255);
-    rect(80*scale, 0, 500, 220);
     textSize(200);
     if(timerTime>60){
       fill(0);
@@ -598,11 +619,82 @@ void mouseClicked() {
     targetZ=constrain(generalZ, zMin, zMax);
     targetMB=constrain(getMBfromRad(getTheta(mouseX/scale-armPos[0],mouseY/scale-armPos[1])), mbmin, mbmax);
   }
+  if(mouseButton==RIGHT){ //recalibrate all the things!
+    for (int obj=0; obj<pingpongPos.length; obj++) {
+      if (mouseOverCircle(scale*pingpongPos[obj][0], scale*pingpongPos[obj][1], scale*pingpongDrawDiameter)) {
+        pingpongPos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+        pingpongPos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        if(obj==0 || obj==pingpongPos.length-1){
+          for(int objCal=1; objCal<pingpongPos.length-1; objCal++){
+            pingpongPos[objCal][0]=pingpongPos[0][0]+objCal/(pingpongPos.length-1.0)*(pingpongPos[pingpongPos.length-1][0]-pingpongPos[0][0]);
+            pingpongPos[objCal][1]=pingpongPos[0][1]+objCal/(pingpongPos.length-1.0)*(pingpongPos[pingpongPos.length-1][1]-pingpongPos[0][1]);
+          }
+          pingpongPos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+          pingpongPos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        }
+        return;
+      }
+    }
+    for (int obj=0; obj<legoPos.length; obj++) {
+      if (mouseOverCircle(scale*legoPos[obj][0], scale*legoPos[obj][1], scale*legoDiameter)) {
+        legoPos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+        legoPos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        if(obj==0 || obj==legoPos.length-1){
+          for(int objCal=1; objCal<legoPos.length-1; objCal++){
+            legoPos[objCal][0]=legoPos[0][0]+objCal/(legoPos.length-1.0)*(legoPos[legoPos.length-1][0]-legoPos[0][0]);
+            legoPos[objCal][1]=legoPos[0][1]+objCal/(legoPos.length-1.0)*(legoPos[legoPos.length-1][1]-legoPos[0][1]);
+          }
+          legoPos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+          legoPos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        }
+        return;
+      }
+    }
+    for (int obj=0; obj<dicePos.length; obj++) {
+      if (mouseOverCircle(scale*dicePos[obj][0], scale*dicePos[obj][1], scale*diceDiameter)) {
+        dicePos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+        dicePos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        if(obj==0 || obj==dicePos.length-1){
+          for(int objCal=1; objCal<dicePos.length-1; objCal++){
+            dicePos[objCal][0]=dicePos[0][0]+objCal/(dicePos.length-1.0)*(dicePos[dicePos.length-1][0]-dicePos[0][0]);
+            dicePos[objCal][1]=dicePos[0][1]+objCal/(dicePos.length-1.0)*(dicePos[dicePos.length-1][1]-dicePos[0][1]);
+          }
+          dicePos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+          dicePos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        }
+        return;
+      }
+    }
+    for (int obj=0; obj<pencilPos.length; obj++) {
+      if (mouseOverCircle(scale*pencilPos[obj][0], scale*pencilPos[obj][1], scale*pencilDiameter)) {
+        pencilPos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+        pencilPos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        if(obj==0 || obj==pencilPos.length-1){
+          for(int objCal=1; objCal<pencilPos.length-1; objCal++){
+            pencilPos[objCal][0]=pencilPos[0][0]+objCal/(pencilPos.length-1.0)*(pencilPos[pencilPos.length-1][0]-pencilPos[0][0]);
+            pencilPos[objCal][1]=pencilPos[0][1]+objCal/(pencilPos.length-1.0)*(pencilPos[pencilPos.length-1][1]-pencilPos[0][1]);
+          }
+          pencilPos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+          pencilPos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        }
+        return;
+      }
+    }
+    for (int obj=0; obj<slotPos.length; obj++) {
+      if (mouseOverCircle(scale*slotPos[obj][0], scale*slotPos[obj][1], scale*slotDrawDiameter)) {
+        slotPos[obj][0]=d*sin(getRadFromMB())+armPos[0];
+        slotPos[obj][1]=-d*cos(getRadFromMB())+armPos[1];
+        /*targetD=sqrt(sq(slotPos[obj][0]-armPos[0])+sq(slotPos[obj][1]-armPos[1]));
+        targetZ=cartonZ;
+        targetMB=getMBfromRad(getTheta(slotPos[obj][0]-armPos[0],slotPos[obj][1]-armPos[1]));*/
+        return;
+      }
+    }
+  }
 }
 
 float getTheta(float dx, float dy){
   float theta=atan(-dx/dy);
-  
   if (dx>0 && dy>0) {
     theta=theta+pi;
   }
@@ -613,7 +705,10 @@ float getTheta(float dx, float dy){
 }
 float getMBfromRad(float theta) {
   //(theta-reference angle in rad)*(µs/rad equivalence) + reference in µs
-  return (int)((theta-pi/2.0)*((1065-1840)/(pi/2 - (-pi/2.0))) + 1065); //1065µs=pi/2, 1840µs= -pi/2 //TODO: calibrate
+  return (int)((theta-pi/2.0)*((1065-1840)/(pi/2 - (-pi/2.0))) + 1065); //1065µs=pi/2, 1840µs= -pi/2
+}
+float getRadFromMB() { //there are such better ways to do this, but no
+  return (mb-1065)/((1065-1840)/(pi/2 - (-pi/2.0)))+pi/2.0; //1065µs=pi/2, 1840µs= -pi/2
 }
 boolean mouseOverCircle(float centerX, float centerY, float diameter) {
   return sq(centerX-mouseX)+sq(centerY-mouseY)<=sq(diameter/2);

@@ -54,7 +54,7 @@ final float slotDrawDiameter = 10; //for drawing
 float[] armPos={75.0/2, 75-17};
 //first index is item, second index is x/y coord (origin is NW corner)
 //all objects are drawn as circles for ease of clicking
-float[][] pingpongPos = {{(75-30)/2.0-tapeWidth-pingpongDiameter/2, 75-30-tapeWidth+pingpongDiameter/2}, 
+/*float[][] pingpongPos = {{(75-30)/2.0-tapeWidth-pingpongDiameter/2, 75-30-tapeWidth+pingpongDiameter/2}, 
   {(75-30)/2.0-tapeWidth-pingpongDiameter/2, 75-30-tapeWidth+pingpongDiameter/2+(30+tapeWidth-pingpongDiameter)*1.0/4.0}, 
   {(75-30)/2.0-tapeWidth-pingpongDiameter/2, 75-30-tapeWidth+pingpongDiameter/2+(30+tapeWidth-pingpongDiameter)*2.0/4.0}, 
   {(75-30)/2.0-tapeWidth-pingpongDiameter/2, 75-30-tapeWidth+pingpongDiameter/2+(30+tapeWidth-pingpongDiameter)*3.0/4.0}, 
@@ -76,23 +76,51 @@ float[][] pencilPos = {{(75+30)/2.0+tapeWidth+pencilLength/2, 75-30-tapeWidth+pe
 float[][] slotPos = {/*{slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0},
   {slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0},*/ /*{slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0}, 
   {slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*1.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*1.0/2.0}, 
-  {slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, */{slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, 
+  {slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, * /{slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, 
   /*{slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, 
   {slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, {slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, */
 
   /*{75-slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.0}, 
   {75-slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0},*/ /*{75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*3.0/2.0}, 
   {75-slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*1.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0-slotDiameter*1.0/2.0}, 
-  {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0},*/ {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, /*
+  {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0},* / {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*1.0/2.0}, /*
   {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*3.0/2.0}, 
   {75-slotDiameter/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, {75-slotDiameter*3.0/2.0, (75-tapeWidth)/4.0+slotDiameter*5.0/2.0}, */
 
   /*{75/2.0-slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0-slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}, 
   {75/2.0-slotDiameter*3.0/2.0, slotDiameter/2.0}, {75/2.0-slotDiameter*3.0/2.0, slotDiameter*3.0/2.0}, 
   {75/2.0-slotDiameter*1.0/2.0, slotDiameter/2.0}, {75/2.0-slotDiameter*1.0/2.0, slotDiameter*3.0/2.0}, 
-  {75/2.0+slotDiameter*1.0/2.0, slotDiameter/2.0},*/ {75/2.0+slotDiameter*1.0/2.0, slotDiameter*3.0/2.0}/*, 
+  {75/2.0+slotDiameter*1.0/2.0, slotDiameter/2.0},* / {75/2.0+slotDiameter*1.0/2.0, slotDiameter*3.0/2.0}/*, 
   {75/2.0+slotDiameter*3.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*3.0/2.0, slotDiameter*3.0/2.0}, 
-  {75/2.0+slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}*/};
+  {75/2.0+slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}* /};*/
+  
+  //pingpong pos 
+float[][]pingpongPos={{18.69047,44.90824},
+{18.517853,51.931183},
+{19.921097,60.656605},
+{23.215591,68.46707},
+{18.0,73.0}};
+//lego pos 
+float[][]legoPos={{20.75,41.0},
+{27.106155,41.911774},
+{34.09808,40.55114},
+{44.393623,39.386703},
+{53.755302,39.448647}};
+//dice pos 
+float[][]dicePos={{24.574303,42.503895},
+{29.996002,41.883987},
+{38.492638,39.8793},
+{49.53487,40.32982}};
+//pencil pos 
+float[][]pencilPos={{62.42129,42.113605},
+{62.697937,48.66779},
+{63.404396,55.57789},
+{64.30237,62.440315},
+{64.54398,71.19793}};
+//slot pos 
+float[][]slotPos={{12.06649,17.37947},
+{72.905075,22.23442},
+{40.1217,6.3045883}};
 
 //Heights to be at when hotkeying to various areas
 final float pingpongZ=11;
@@ -196,7 +224,7 @@ void setup()
   fullScreen();
   //size(500,500);
   
-  /*Serial serial = new Serial(this, Serial.list()[0], 9600);
+  Serial serial = new Serial(this, Serial.list()[0], 9600);
   sender = new ValueSender(this, serial);
   
   sender.observe("servoM0");
@@ -205,7 +233,7 @@ void setup()
   sender.observe("servoMb"); 
   sender.observe("servoPump");  
   delay(1710); 
-  servoPump=1700;*/
+  servoPump=1700;
   
 }
 void draw() {

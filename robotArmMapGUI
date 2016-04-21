@@ -1,7 +1,7 @@
 import processing.serial.*;
 import vsync.*;
 
-//by Max Johnson
+//by Max Johnson, 2016, maximusjohnsonus@gmail.com
 /*
 m = motor
               m1   b   m2
@@ -11,7 +11,7 @@ m = motor
            /
        ___O___ <-m0
  ____h{|__O__|____
-          ^mb (motor in base that rotates arm)
+          ^mB (motor in base that rotates arm)
  
  COMPETITION AREA
  75x75 cm (marked by inside edge of tape (~2.5 cm wide (electrical tape is 1.9 cm))
@@ -26,18 +26,29 @@ m = motor
  4 dice on North side between legos (1 facing up)
  */
 //run sketch robotArmProcessingReceiver on arduino
+//plug arduino in via USB
+//run this sketch in Processing (I wrote it in 3.0.2)
+//+++ !!! Pro tips: !!! +++
+//When the program starts up, the arm will flail a bit. I recommend holding it gently or unplugging the power
+//If the 6V source is plugged in, the arduino needs to be plugged in. Otherwise it might flail
+//To prevent it from breaking, move the arm with your hands as little as possible: stick to using the controls when possible
+//If you Are moving it with your hands, it's better to move each joint by applying torque close to the servo. I'd be the most careful with rotating the arm. It should be fine if you twist it by holding it at m0, but if you hold onto the carbon nanotubes and twist, you'll pry break the glue joints (AGAIN)
+//Oh yeah, and a lot of times when you plug in the power, the base motor (mB) doesn't work. Have you tried unpluging it and plugging it back in? (seriously. I have no idea why. Email me if you figure it out)
+//And DEFINITELY oil the syringe. Vaseline works but not as well. If you let it sit a little while, it might stick, but if you force it to move by pushing or pulling it, it should loosen up
+//And also when you go out too far (like the furthest cartons), it tries to go beneath the plane of the ground, which is generally bad
 
 //Arm Sizes
 final float a = 31.1; //length in cm
 final float b = 31.3; //length in cm
-final float c = 8;  //length in cm //this one really doesn't matter??
-final float h = 11;  //length in cm //this one doesn't actually matter much?
+//final float c = 8;  //length in cm //this one really doesn't matter??
+//final float h = 11;  //length in cm //this one doesn't actually matter much? if at all?
 
 //Constant
-final float pi=3.1416;
+final float pi=3.1416; //this is pi
 
 //Board layout
 //all measurements in cm
+//This is all kind of useless because the arm has its own idea of where things are. If you make a setup, calibrate (by right clicking), then press L, it'll log the board setup. I just used that, but make sure to recalibrate before each actual run
 final float tapeWidth=2.5;
 final float pingpongDiameter = 4; //for positioning
 final float pingpongDrawDiameter = 4.9; //for drawing
@@ -52,6 +63,8 @@ final float pencilDiameter = 7; //for drawing
 final float slotDiameter = 5; //for positioning
 final float slotDrawDiameter = 10; //for drawing
 float[] armPos={75.0/2, 75-17};
+
+//This is all the ideal positions, but the arm has its own ideas. You pry want to delete this all, since the map should be different
 //first index is item, second index is x/y coord (origin is NW corner)
 //all objects are drawn as circles for ease of clicking
 /*float[][] pingpongPos = {{(75-30)/2.0-tapeWidth-pingpongDiameter/2, 75-30-tapeWidth+pingpongDiameter/2}, 
@@ -95,7 +108,7 @@ float[][] slotPos = {/*{slotDiameter/2.0, (75-tapeWidth)/4.0-slotDiameter*5.0/2.
   {75/2.0+slotDiameter*5.0/2.0, slotDiameter/2.0}, {75/2.0+slotDiameter*5.0/2.0, slotDiameter*3.0/2.0}* /};*/
   
   //pingpong pos 
-float[][]pingpongPos={{18.69047,44.90824},
+float[][]pingpongPos={{18.69047,44.90824}, //these are all from logging the board position, as described in a comment above
 {18.517853,51.931183},
 {19.921097,60.656605},
 {23.215591,68.46707},
@@ -122,17 +135,17 @@ float[][]slotPos={{12.06649,17.37947},
 {72.905075,22.23442},
 {40.1217,6.3045883}};
 
-//Heights to be at when hotkeying to various areas
+//Heights to be at when hotkeying to various areas (I think it's height of m2 above m0? and giving it the same height at different positions on the board makes it go to different actual heights. Slightly poor construction I guess)
 final float pingpongZ=11;
 final float legoZ=8;
 final float diceZ=8;
 final float pencilZ=5;
 final float cartonZ=15;
-final float generalZ=15;
-final float maneuveringZ=20;
+final float generalZ=15; //when we click on something that isn't an object, how high do we go?
+final float maneuveringZ=20; //how high do we need to go when moving to a clicked location?
 //Other good positions
-final float[] preStartPos = {1,1500,a+b-2}; //(r, theta in µs, z)
-final float[] startPos = {legoPos[2][0],legoPos[2][1],legoZ}; //cartesian coords
+final float[] preStartPos = {1,1500,a+b-2}; //(radius, theta in µs, z) //position that fits in the box
+final float[] startPos = {legoPos[2][0],legoPos[2][1],legoZ}; //rectangular coords
 
 //Colors
 final color pingpongColor = color(230);
@@ -146,7 +159,7 @@ final color pencilSelectedColor = color(255-250, 255-190, 255-50);
 final color slotColor = color(200);
 final color slotSelectedColor = color(255-200);
 
-//Step sizes
+//Step sizes - how fast does it go?
 final float fastmbStep = 5; //µs
 final float fastm2Step = 0.035;
 final float fastdStep = 0.2;
@@ -155,12 +168,13 @@ final float slowmbStep = 0.5; //µs
 final float slowm2Step = 0.0035;
 final float slowdStep = 0.015;
 final float slowzStep = 0.02;
+//below are the variables, above are the constant values that the variables will take
 float mbStep = fastmbStep; //step distance (rad) for mb angle
 float m2Step = fastm2Step; //step distance (rad) for m2 angle
 float dStep = fastdStep; //step distance (cm) for d
 float zStep = fastzStep; //step distance (cm) for z
 
-//Mins and Maxs
+//Mins and Maxs - so that it doesn't kill itself too much
 final float m0max=pi; 
 final float m0min=0;
 final float m1max=2.778; //calculated to be 2249µs
@@ -174,7 +188,7 @@ final float dMin=1; //TODO: play with this
 final float zMax=a+b-0.5; //note: d*d+z*z <= (a+b)(a+b) regardless of dMax and zMax. There's no real reason to make either lower
 final float zMin=-10; //TODO: play with this
 
-//Keys
+//Keys (careful about caps here)
 final char keyForward='8'; //change d, 
 final char keyBackward='5';//which will move m0 and m1
 final char keyUpward='w'; //change z, 
@@ -201,29 +215,31 @@ float z=a; //distance (cm) from base (h above ground) to m2
 float x; //x is distance from m0 to m2 (calculated)
 
 //"Servos" which hold the microsecond number we want to write with VSync
-public int servoM0;
+public int servoM0; //Note: for most servos, 1500µs is the center position and the range is 750µs to 2250µs, which is the case for all but mB
 public int servoM1;
 public int servoM2;
 public int servoMb;
-public int servoPump;
+public int servoPump; //The one that drives the syringe
 
 //Misc
-float scale = 9; // pix/cm
+float scale = 9; // pix/cm (how big is the display?)
 ValueSender sender; //VSync
 boolean keys[]=new boolean[128]; //stores which keys are currently pressed
-boolean gottaGoFast=false; //set to true to get to a target d, z, mB
-float targetD;
+boolean gottaGoFast=false; //set to true to make arm move to the target d,z,mb
+float targetD; //targets are for control by click
 float targetZ;
 float targetMB;
-final float jumpSpeed = 5; //_ times faster than normal
-long time;
-boolean runTime=false;
+final float jumpSpeed = 5; //move _ times faster than normal when moving due to click
+long time; //what time did the timer start?
+boolean runTime=false; //should the timer be running?
 
 void setup()
 {
   fullScreen();
   //size(500,500);
   
+  //Comment the rest of setup() out if you're testing it without an arduino plugged in
+  //(Or figure out 
   Serial serial = new Serial(this, Serial.list()[0], 9600);
   sender = new ValueSender(this, serial);
   
@@ -232,17 +248,19 @@ void setup()
   sender.observe("servoM2");
   sender.observe("servoMb"); 
   sender.observe("servoPump");  
-  delay(1710); 
+  delay(1710); //this makes it flail slightly less
   servoPump=1700;
   
 }
 void draw() {
-  servoM0=getM0pos();
+  delay(5); //for stability or smoothness or something?
+
+  servoM0=getM0pos(); //refresh the positions of servos
   servoM1=getM1pos();
   servoM2=getM2pos();
   servoMb=getMBpos();
   
-  if(keys['l']){ //log positions
+  if(keys['l']){ //log the positions of all the objects on the board
     print("//pingpong pos \n{");
     for (int obj=0; obj<pingpongPos.length; obj++) {
       println("{"+pingpongPos[obj][0]+","+pingpongPos[obj][1]+"},");
@@ -265,12 +283,10 @@ void draw() {
     }
   }
 
-  delay(5);
-
-  background(255);
-  fill(0);
-  stroke(0);
-  textSize(16);
+  background(255); //white background
+  fill(0); //draw in black
+  stroke(0); //outline in black
+  textSize(16); //16!!!
   text(keyForward+"/"+keyBackward+" or ↑/↓ - Forward/backward \n"+
     keyRotateLeft+"/"+keyRotateRight+" or ←/→ - Rotate left/right \n"+
     keyUpward+"/"+keyDownward+" - Up/down \n"+
@@ -282,6 +298,8 @@ void draw() {
     pointHandDown+" - Point hand down \n"+
     "Click to go, Right click to calibrate"
     ,80*scale,250,1300,700);
+  
+  //draw the board
   rect(scale*((75-30)/2.0-tapeWidth), scale*(75-30-tapeWidth), scale*(30+2*tapeWidth), scale*(30+tapeWidth));
   rect(0, scale*(75-tapeWidth)/2.0, scale*75, scale*tapeWidth);
   line(0, scale*75, scale*75, scale*75);
@@ -318,7 +336,7 @@ void draw() {
     ellipse(scale*dicePos[obj][0], scale*dicePos[obj][1], scale*diceDiameter, scale*diceDiameter);
     fill(0);
     textSize(16);
-    text("DIE!",scale*dicePos[obj][0]-14, scale*dicePos[obj][1]+6);
+    text("DIE!",scale*dicePos[obj][0]-14, scale*dicePos[obj][1]+6); //make sure to have a little fun with your code :P
   }
   for (int obj=0; obj<pencilPos.length; obj++) {
     if (mouseOverCircle(scale*pencilPos[obj][0], scale*pencilPos[obj][1], scale*pencilDiameter)) {
@@ -337,17 +355,19 @@ void draw() {
     ellipse(scale*slotPos[obj][0], scale*slotPos[obj][1], scale*slotDrawDiameter, scale*slotDrawDiameter);
   }
   
-  stroke(color(random(255), random(255), random(255)));
+  stroke(color(random(255), random(255), random(255))); //Joseph and the Amazing Technicolor Dreamarm?
   line(scale*armPos[0], scale*armPos[1], scale*(armPos[0]+d*sin((mb-1065)*pi/(-775)+pi/2)), scale*(armPos[1]-d*cos((mb-1065)*pi/(-775)+pi/2)));
   
-  if(gottaGoFast){
-    if(z<maneuveringZ && !(d==targetD && mb==targetMB)){ //go up a safe distance
+  if(gottaGoFast){ //If we're travelling to a clicked location
+    if(z<maneuveringZ && !(d==targetD && mb==targetMB)){ //if we aren't a safe distance above the board (maneuvering z), go up. If we're at our destination (except for in z), this does not apply
       z+=jumpSpeed*fastzStep;
-    } else { //then maneuver
-      m2abs=pi/2; //point hand down
+    } else { //if we're a safe distance up, maneuver
+      m2abs=pi/2; //point hand straight down - it's pretty much always better
+      
+      //step d,z,mB until they reach their targets
       if(d<targetD){
         d+=jumpSpeed*fastdStep;
-        if(d>targetD){
+        if(d>targetD){ //if we overshot it, go to exactly the right distance
           d=targetD;
         }
       } else if(d>targetD){
@@ -394,7 +414,7 @@ void draw() {
         d+=dStep;
       if (sq(d)+sq(z)>sq(a+b)) { //basically just make the arm not try to stretch more than a+b
         float dT = sqrt(sq(dStep)+sq(zStep))/(a+b); //change in angle
-        d=(a+b)*cos(m0-dT);
+        d=(a+b)*cos(m0-dT); //I tried to figure out what I was doing here after I did this math and then I got bored. You might want to figure out if this all is right.
         z=sqrt(sq(a+b)-sq(d))-0.000001;
       }
       servoM0=getM0pos();
@@ -480,6 +500,7 @@ void draw() {
       println("start run");
       time=millis();
       runTime=true;
+      //Go to start pos, set to be over one of the legos I think
       targetD = sqrt(sq(startPos[0]-armPos[0])+sq(startPos[1]-armPos[1]));
       targetMB = getMBfromRad(getTheta(startPos[0]-armPos[0],startPos[1]-armPos[1]));
       targetZ = startPos[2];
@@ -513,15 +534,16 @@ void draw() {
 
 int getM0pos() {
   x=sqrt(sq(d)+sq(z));
-  m0=acos((sq(a)+sq(x)-sq(b))/(2*a*x))+atan(z/d);
+  m0=acos((sq(a)+sq(x)-sq(b))/(2*a*x))+atan(z/d); //this is some good math. Set up a triangle with a,b, and x as the sides and use law of cosines to find the angles you need for M0 and M1
   if (m0>m0max) {
     m0=m0max;
   }
   if (m0<m0min || Float.isNaN(m0)) {
     m0=m0min;
   }
+  //convert from radians to microseconds:
   //(m0-reference angle in rad)*(µs/rad equivalence) + reference in µs
-  return constrain((int)((m0-0)*((1715-900)/(pi/2-0)) + 900), 751, 2249); //900µs=0 rad, 1715µs=pi/2 rad
+  return constrain((int)((m0-0)*((1715-900)/(pi/2-0)) + 900), 751, 2249); //900µs=0 rad, 1715µs=pi/2 rad (measured)
 }
 int getM1pos() {
   x=sqrt(sq(d)+sq(z));
@@ -537,6 +559,7 @@ int getM1pos() {
   return constrain((int)((m1-pi/2)*((1565-1120)/(pi/2-pi/4)) + 1565), 751, 2249); //1565µs=pi/2 rad, 1120µs=pi/4 rad
 }
 int getM2pos() {
+  //use m2abs to keep hand pointed in one direction when you move around.
   m2=m2abs+pi-m0-m1; 
   if (m2<m2min || Float.isNaN(m2)) {
     m2=m2min;
@@ -721,7 +744,7 @@ void mouseClicked() {
   }
 }
 
-float getTheta(float dx, float dy){
+float getTheta(float dx, float dy){ //stuff about getting signs working. I just played around with negatives and pi until things worked
   float theta=atan(-dx/dy);
   if (dx>0 && dy>0) {
     theta=theta+pi;
